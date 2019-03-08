@@ -1,4 +1,4 @@
-package ultracar.treinando;
+package api.restful.treinando;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
