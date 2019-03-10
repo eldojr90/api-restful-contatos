@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import api.restfull.treinando.model.Contato;
@@ -36,15 +34,14 @@ public class ContatoResource {
 		this.service = service;
 	}
 	
-	@GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping
 	@ResponseBody
 	public ResponseEntity<?> findAll() {
 		List<Contato> contatos = this.service.findAll();
 		return new ResponseEntity<List<Contato>>(contatos, HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/buscar/id/{id}", 
-				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping("/{id}")
 	@ResponseBody
 	public ResponseEntity<?> find(@PathVariable(value="id") Long id) {
 			
@@ -59,10 +56,8 @@ public class ContatoResource {
 		return Message.messageError(HttpStatus.NOT_FOUND, "id "+id+" inexistente");
 	}
 	
-	@PostMapping(value="/novo", 
-				 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping
 	@ResponseBody
-	@ResponseStatus(value=HttpStatus.CREATED)
 	public ResponseEntity<?> create(@Valid @RequestBody Contato contato, Errors errors) {
 		if(!errors.hasErrors()) {
 			Contato contatoCreated = this.service.create(contato);
@@ -72,8 +67,7 @@ public class ContatoResource {
 		return Message.messageErrorDefault(errors);
 	}
 	
-	@PutMapping(value="/atualizar/{id}", 
-			 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PutMapping("/{id}")
 	@ResponseBody
 	public ResponseEntity<?> update(@PathVariable("id") Long id,
 									@Valid @RequestBody Contato contato, 
@@ -83,7 +77,7 @@ public class ContatoResource {
 			Contato contatoUpdated = this.service.update(id, contato);
 			
 			if(contatoUpdated == null) {
-				return Message.messageError(HttpStatus.NOT_FOUND, "id "+id+" inexistente");
+				return ResponseEntity.notFound().build();
 			}
 			
 			return new ResponseEntity<Contato>(contatoUpdated, HttpStatus.OK);
@@ -92,18 +86,17 @@ public class ContatoResource {
 		return Message.messageErrorDefault(errors);
 	}
 	
-	@DeleteMapping(value="/excluir/{id}",  
-			 	   produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@DeleteMapping("/{id}")
 	@ResponseBody
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 
 		Contato contatoDelecao = this.service.delete(id);
 		
 		if(contatoDelecao != null) {
-			return ResponseEntity.ok().body(contatoDelecao);
+			return ResponseEntity.noContent().build();
 		}
 			
-		return Message.messageError(HttpStatus.NOT_FOUND, "id "+id+" inexistente");
+			return ResponseEntity.notFound().build();
 	}
 	
 }
